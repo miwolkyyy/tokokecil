@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./output.css" rel="stylesheet" />
+    <!-- alpine js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- fontawesome -->
+    <script src="https://kit.fontawesome.com/121b557acd.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="h-[700vh] bg-slate-100 overflow-x-hidden">
+    <div id="hero" class="hero min-h-screen" style="background-image: url(../img/bg/pexels-kindelmedia-7456557.jpg)">
+      <div class="hero-overlay"></div>
+      <div class="hero-content text-neutral-content text-center">
+        <div class="max-w-md">
+          <div class="flex flex-row items-center justify-center gap-2">
+            <h1 class="mb-5 text-5xl font-bold"><span class="text-green-400">To</span>ko <br />Sa<span class="text-green-400">yur</span></h1>
+            <p class="mb-5 text-start">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+          </div>
+          <a href="#product" class="btn bg-green-700 rounded-lg">Get Started</a>
+        </div>
+      </div>
+    </div>
+    <!--  -->
+    <div class="drawer drawer-end sticky top-0" x-data="products()" style="z-index: 9999">
+      <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content">
+        <nav class="navbar border-b bg-base-100 px-4 p-0 flex justify-between">
+          <div>
+            <h1 class="text-sm font-bold"><span class="text-green-400">To</span>ko<br />Sa<span class="text-green-400">yur</span></h1>
+          </div>
+          <div>
+            <label x-data="{searchItems: '' }" class="input input-sm input-ghost">
+              <img src="../img/icon/magnifying-glass-solid.svg" class="w-3" alt="" />
+              <input x-model="searchItems" type="text" class="input-xs input-ghost" placeholder="Search... " id="input-search" autocomplete="off" @input="console.log(searchItems)" />
+            </label>
+          </div>
+          <div class="">
+            <label for="my-drawer-4" class="drawer-button" @click="console.log($store.cart.quantity)">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <div class="indicator">
+                  <img src="../img/icon/cart-shopping-solid.svg" class="w-5" alt="" />
+                  <span class="badge badge-sm indicator-item text-orange-400" x-show="$store.cart.quantity" x-text="$store.cart.quantity"></span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </nav>
+      </div>
+      <div class="drawer-side z-50">
+        <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"> </label>
+        <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+          <template x-for="(item,index) in $store.cart.items">
+            <!-- Sidebar content here -->
+            <li class="border-b-2 border-dashed p-2 w-full">
+              <div class="flex justify-between items-center">
+                <img :src="`../img/sayur hijau/${item.img}`" class="w-12 rounded-md" alt="" />
+                <div class="text-center">
+                  <div class="indicator text-center">
+                    <h1 class="text-lg" x-text="item.name"></h1>
+                    <span class="badge badge-xs" x-text="item.quantity + 'pcs'"></span>
+                  </div>
+                  <div class="flex gap-3 items-center">
+                    <p class="btn btn-ghost btn-xs" @click="$store.cart.add(item)">+</p>
+                    <p x-text="rupiah(item.total)">2000</p>
+                    <p class="btn btn-ghost btn-xs" @click="$store.cart.remove(item.id)">-</p>
+                  </div>
+                </div>
+                <div class="">
+                  <i class="fa-solid fa-trash" style="color: #a4a5a8"></i>
+                </div>
+              </div>
+            </li>
+          </template>
+          <div class="flex items-center justify-center mt-12 flex-row gap-4">
+            <h1 class="text-center text-xl" x-show="!$store.cart.items.length">Chart is not empety</h1>
+            <button class="btn btn-accent text-center" x-show="$store.cart.items.length">
+              <p>Total belanja</p>
+              <p class="text-3xl" x-text="rupiah($store.cart.total)"></p>
+            </button>
+          </div>
+        </ul>
+      </div>
+    </div>
+    <!-- product -->
+    <div id="product" class="py-8 w-screen" x-data="products">
+      <div class="container grid grid-cols-2 gap-4 mx-auto px-4 md:grid-cols-3 lg:grid-cols-5">
+        <template x-for="item in filterProducts()" :key="item.name">
+          <div class="card bg-base-100 w-44 shadow-sm">
+            <figure class="p-2 rounded-md">
+              <img :src="`../img/sayur hijau/${item.img}`" alt="Shoes" class="rounded-md" />
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title name-products" x-text="item.name">Card Title</h2>
+              <p x-text="rupiah(item.price)">A card component has a figure, a body part, and inside body there are title and actions parts</p>
+              <div class="card-actions justify-center">
+                <button class="btn hover:bg-teal-200 hover:border-slate-400" @click="$store.cart.add(item)">
+                  <i class="fa-solid fa-basket-shopping" style="color: #63e6be"></i>
+                </button>
+                <button class="btn hover:bg-cyan-200 hover:border-slate-400" onclick="my_modal_2.showModal()" @click="openModal(item)">
+                  <i class="fa-solid fa-eye" style="color: #74c0fc"></i>
+                </button>
+              </div>
+            </div>
+            <dialog x-show="selectedProduct" :id="`my_modal_${item.id}`" class="modal">
+              <div class="modal-box">
+                <form method="dialog">
+                  <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                </form>
+                <div class="flex gap-4">
+                  <img :src="`../img/sayur hijau/${selectedProduct ? selectedProduct.img :''}`" alt="" class="w-28 lg:w-40 rounded-md" />
+                  <div class="">
+                    <p x-text="selectedProduct ? selectedProduct.name :''">Lorem, ipsum.</p>
+                    <p x-text="selectedProduct ? selectedProduct.price : ''">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam, consequuntur?</p>
+                  </div>
+                </div>
+              </div>
+            </dialog>
+          </div>
+        </template>
+        <template x-if="filterProducts().length === 0 && searchItems !== ''">
+          <div class="col-span-full text-center py-8">
+            <p class="text-gray-500">Tidak ada produk yang cocok dengan pencarian "<span x-text="searchItems"></span>".</p>
+          </div>
+        </template>
+      </div>
+    </div>
+    <!-- product end -->
+    <script src="../js/alpine.js"></script>
+    <script src="../js/filter.js"></script>
+  </body>
+</html>
